@@ -2,23 +2,32 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const fs = require('fs');
 
-const validEvent = ['pull_request'];
+function isMajor(title)
+{
+    return title.startsWith("major:");
+}
+
+function isMinor(title)
+{
+    return title.startsWith("minor:");
+}
+
+function isPatch(title)
+{
+    return title.startsWith("patch:");
+}
 
 function validateTitle(title) 
 {
-    return title.startsWith("major:") || title.startsWith("minor:") || title.startsWith("patch:");
+    return isMajor(title) || isMinor(title) || isPatch(title);
 }
 
-async function run() 
+async function run()
 {
     {
         try
         {
             const authToken = core.getInput('github_token', {required: true})
-            const eventName = github.context.eventName;
-
-            core.info(`Event name: ${eventName}, token: ${authToken}`);
-
             const owner = github.context.payload.pull_request.base.user.login;
             const repo = github.context.payload.pull_request.base.repo.name;
 
@@ -47,8 +56,39 @@ async function run()
                 let versionEnd = content.indexOf("\n", versionStart);
 
                 let version = content.substring(versionStart, versionEnd);
+                let versionList = version.split('.');
 
-                core.info("Current version is " + version);
+                if (versionList.length == 3)
+                {
+                    if (isPatch(title))
+                    {
+                        versionList[2] = parseInt(versionList[2]) + 1;
+                    }
+                    else if (isMinor(title))
+                    {
+                        versionList[2] = "0";
+                        versionList[1] = parseInt(versionList[1]) + 1;
+                    }
+                    else if (isMajor(title))
+                    {
+                        versionList[2] = "0";
+                        versionList[1] = "0";
+                        versionList[0] = parseInt(versionList[0]) + 1;
+                    }
+                }
+                else
+                {
+                    core.setFailed("Unity version is in a wrong format");
+                }
+
+                let newVersion = versionList[0] + "." + versionList[1] + "." + versionList[2]
+                let newFileContent = content.substring(0, versionStart) + newVersion + content.substring(versionEnd, content.length);
+
+                await fs.promises.writeFile("ProjectSettings/ProjectSettings.asset", newFileContent, {
+                    encoding: 'utf8'
+                });
+
+                core.info(`Updated from ${version} to ${newVersion}`);
             }
             else
             {
