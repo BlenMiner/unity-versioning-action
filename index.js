@@ -89,6 +89,10 @@ async function run()
                 });
 
                 core.info(`Updated from ${version} to ${newVersion}`);
+
+                let newcontent = await fs.promises.readFile("ProjectSettings/ProjectSettings.asset", "utf8");
+
+                core.info(newcontent);
             }
             else
             {
