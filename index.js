@@ -4,7 +4,7 @@ const fetch = require('cross-fetch');
 
 const endpoit = "https://build-api.cloud.unity3d.com/api/v1/orgs/20066711958695";
 
-async function SetEnvVariables(projectId, buildtargetid, vars)
+async function SetEnvVariables(cloudToken, projectId, buildtargetid, vars)
 {
     let url = `${endpoit}/projects/${projectId}/buildtargets/${buildtargetid}/envvars`;
     await fetch(url, {
@@ -17,7 +17,7 @@ async function SetEnvVariables(projectId, buildtargetid, vars)
     });
 }
 
-async function CreateBuildTarget(projectId, branch, name)
+async function CreateBuildTarget(cloudToken, projectId, branch, name)
 {
     let url = `${endpoit}/projects/${projectId}/buildtargets`;
     let response = await fetch(url, {
@@ -77,7 +77,7 @@ async function CreateBuildTarget(projectId, branch, name)
     let json = await response.json();
     const buildtargetid = json.buildtargetid;
 
-    await SetEnvVariables(projectId, buildtargetid, {
+    await SetEnvVariables(cloudToken, projectId, buildtargetid, {
         KEY: core.getInput('S3_KEY', {required: true}),
         SECRET: core.getInput('S3_SECRET', {required: true}),
         BUCKET: core.getInput('S3_BUCKET', {required: true}),
@@ -91,17 +91,17 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
     {
         const projectId = await CreateProject(cloudToken, repoName, repoSSHUrl);
 
-        await CreateBuildTarget(projectId, "dev", "standalonewindows64");
-        await CreateBuildTarget(projectId, "dev", "standaloneosxuniversal");
-        await CreateBuildTarget(projectId, "dev", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64");
+        await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal");
+        await CreateBuildTarget(cloudToken, projectId, "dev", "standalonelinux64");
 
-        await CreateBuildTarget(projectId, "staging", "standalonewindows64");
-        await CreateBuildTarget(projectId, "staging", "standaloneosxuniversal");
-        await CreateBuildTarget(projectId, "staging", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "staging", "standalonewindows64");
+        await CreateBuildTarget(cloudToken, projectId, "staging", "standaloneosxuniversal");
+        await CreateBuildTarget(cloudToken, rojectId, "staging", "standalonelinux64");
 
-        await CreateBuildTarget(projectId, "prod", "standalonewindows64");
-        await CreateBuildTarget(projectId, "prod", "standaloneosxuniversal");
-        await CreateBuildTarget(projectId, "prod", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "prod", "standalonewindows64");
+        await CreateBuildTarget(cloudToken, projectId, "prod", "standaloneosxuniversal");
+        await CreateBuildTarget(cloudToken, projectId, "prod", "standalonelinux64");
     }
     catch (error) { core.setFailed(error.message); }
 }
