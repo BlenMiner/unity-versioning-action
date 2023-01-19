@@ -66,6 +66,8 @@ async function DeleteAllBuildTargets(cloudToken, projectId)
 
 async function CreateBuildTarget(cloudToken, projectId, branch, name)
 {
+    core.notice("Creating " + name + "-" + branch);
+
     let url = `${endpoit}/projects/${projectId}/buildtargets`;
     let response = await fetch(url, {
         method: "POST",
@@ -161,35 +163,6 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
     catch (error) { core.setFailed(error.message); }
 }
 
-async function GetProjectSSHKey(projectId, cloudToken, repoName, repoSSHUrl) {
-    let url = `${endpoit}/projects/${projectId}/sshkey`;
-
-    let response = await fetch(url, {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${cloudToken}`
-        },
-        body: JSON.stringify({
-            name: repoName,
-            disabled: false,
-            disableNotifications: true,
-            generateShareLinks: true,
-            settings: {
-                remoteCacheStrategy: "library",
-                scm: {
-                    type: "git",
-                    url: repoSSHUrl
-                }
-            }
-        })
-    });
-
-    let json = await response.json();
-    const publicSSHKey = json.publickey;
-    return publicSSHKey;
-}
-
 async function CreateProject(cloudToken, repoName, repoSSHUrl) {
     let url = `${endpoit}/projects`;
     let response = await fetch(url, {
@@ -225,21 +198,37 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
     }
 }
 
-async function RebuildLauncher(cloudToken) 
+async function RebuildLauncher(cloudToken, branch) 
 {
-    let url = `${endpoit}/projects/ig-launcher/buildtargets/_all/builds`;
-
-    await fetch(url, {
-        method: "POST",
+    let url = `${endpoit}/projects/${projectId}/buildtargets`;
+    let res = await fetch(url, {
+        method: "GET",
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Basic ${cloudToken}`
-        },
-        body: JSON.stringify({
-            clean: false,
-            delay: 0
-        })
+        }
     });
+
+    let json = await res.json();
+    for(let i = 0; i < json.length; ++i)
+    {
+        if (json[i].endsWith(branch))
+        {
+            core.notice("Trigger build for: " + json[i].name);
+
+            await fetch(`${endpoit}/projects/ig-launcher/buildtargets/_all/builds`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${cloudToken}`
+                },
+                body: JSON.stringify({
+                    clean: false,
+                    delay: 0
+                })
+            });
+        }
+    }
 }
 
 async function run()
@@ -260,7 +249,8 @@ async function run()
             }
             else
             {
-                await RebuildLauncher(cloudToken);
+                const branch = github.context.ref.substring("refs/heads/".length);
+                await RebuildLauncher(cloudToken, branch);
             }
         }
         catch (error)
