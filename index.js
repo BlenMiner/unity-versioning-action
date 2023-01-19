@@ -12,8 +12,7 @@ async function GetProjectIdByName(cloudToken, projectName)
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Basic ${cloudToken}`
-        },
-        body: JSON.stringify(vars)
+        }
     });
 
     let json = await res.json();
