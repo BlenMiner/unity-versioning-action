@@ -27,7 +27,7 @@ async function GetProjectIdByName(cloudToken, projectName)
 async function SetEnvVariables(cloudToken, projectId, buildtargetid, vars)
 {
     let url = `${endpoit}/projects/${projectId}/buildtargets/${buildtargetid}/envvars`;
-    let res = await fetch(url, {
+    await fetch(url, {
         method: "PUT",
         headers: {
             'Content-Type': 'application/json',
@@ -35,9 +35,30 @@ async function SetEnvVariables(cloudToken, projectId, buildtargetid, vars)
         },
         body: JSON.stringify(vars)
     });
+}
+
+async function DeleteAllBuildTargets(cloudToken, projectId)
+{
+    let url = `${endpoit}/projects/${projectId}/buildtargets`;
+    let res = await fetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${cloudToken}`
+        }
+    });
 
     let json = await res.json();
-    core.info("SetEnvVariables\n" + JSON.stringify(json));
+    for(let i = 0; i < json.length; ++i)
+    {
+        await fetch(`${endpoit}/projects/${projectId}/buildtargets/${json[i].buildtargetid}`, {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${cloudToken}`
+            }
+        });
+    }
 }
 
 async function CreateBuildTarget(cloudToken, projectId, branch, name)
@@ -74,9 +95,9 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                 operatingSystemSelected: "mac",
                 advanced: {
                     unity: {
-                        preExportMethod: "",
-                        postExportMethod: "",
-                        scriptingDefineSymbols: "",
+                        preExportMethod: "AddressableHelper.PreBuildAddressables",
+                        postExportMethod: "AddressableHelper.PostBuildAddressables",
+                        scriptingDefineSymbols: branch,
                         playerExporter: {
                             export: false
                         },
@@ -98,14 +119,13 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
     });
 
     let json = await response.json();
-    core.info("CreateBuildTarget\n" + JSON.stringify(json));
     let buildtargetid = json.buildtargetid;
 
     if (buildtargetid == null || buildtargetid == undefined)
     buildtargetid = name;
 
     await SetEnvVariables(cloudToken, projectId, buildtargetid, {
-        KEY: core.getInput('S3_KEY', {required: true}),
+        KEY:    core.getInput('S3_KEY', {required: true}),
         SECRET: core.getInput('S3_SECRET', {required: true}),
         BUCKET: core.getInput('S3_BUCKET', {required: true}),
         REGION: core.getInput('S3_REGION', {required: true}),
@@ -121,7 +141,7 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
         if (projectId == null || projectId == undefined)
             projectId = repoName;
 
-        core.info(projectId);
+        await DeleteAllBuildTargets();
 
         await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64");
         await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal");
@@ -191,7 +211,6 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
     });
 
     let json = await response.json();
-    core.info("CreateProject\n" + JSON.stringify(json));
 
     if (json.projectid === undefined)
     {
