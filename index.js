@@ -23,7 +23,9 @@ async function run()
 
             let json = await response.json();
 
-            core.info(json);
+            core.info(url);
+            core.info(JSON.stringify(json));
+            core.info(github);
         }
         catch (error)
         {
