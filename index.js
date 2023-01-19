@@ -4,7 +4,7 @@ const fetch = require('cross-fetch');
 
 const endpoit = "https://build-api.cloud.unity3d.com/api/v1/orgs/will_ig";
 
-async function GetProjectIdByName(projectName)
+async function GetProjectIdByName(cloudToken, projectName)
 {
     let url = `${endpoit}/projects`;
     let res = await fetch(url, {
@@ -196,7 +196,7 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
 
     if (json.projectid === undefined)
     {
-        return GetProjectIdByName(repoName);
+        return GetProjectIdByName(cloudToken, repoName);
     }
     else
     {
