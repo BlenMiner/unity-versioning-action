@@ -17,6 +17,7 @@ async function GetProjectIdByName(cloudToken, projectName)
 
     let json = await res.json();
 
+    core.info("SetEnvVariables\n" + json + "\n" + json.Length);
     
     for(let i = 0; i < json.Length; ++i)
     {
