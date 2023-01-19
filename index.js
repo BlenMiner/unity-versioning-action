@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const fetch = require('cross-fetch');
 
-const endpoit = "https://build-api.cloud.unity3d.com/api/v1/api.json";
+const endpoit = "https://build-api.cloud.unity3d.com/api/v1";
 
 async function run()
 {
@@ -11,7 +11,7 @@ async function run()
         {
             const cloudToken = core.getInput('token', {required: true});
 
-            let url = `${endpoit}/orgs/20066711958695/projects/${github.context.repo.repo}/buildtargets/_all/builds`;
+            let url = `${endpoit}/orgs/20066711958695/projects/ig-launcher/buildtargets/_all/builds`;
             
             const response = await fetch(url, {
                 method: "GET",
