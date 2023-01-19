@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const fetch = require('@cross-fetch');
+const fetch = require('cross-fetch');
 
 const endpoit = "https://build-api.cloud.unity3d.com/api/v1/api.json";
 
