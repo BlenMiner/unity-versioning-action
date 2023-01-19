@@ -20,7 +20,6 @@ async function GetProjectIdByName(cloudToken, projectName)
     
     for(let i = 0; i < json.Length; ++i)
     {
-        core.info("GetProjectIdByName\n" + JSON.stringify(json));
         if (json[i].name == projectName) return json[i].projectid;
     }
     return undefined;
