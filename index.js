@@ -212,7 +212,7 @@ async function RebuildLauncher(cloudToken, branch)
     let json = await res.json();
     for(let i = 0; i < json.length; ++i)
     {
-        if (json[i].endsWith(branch))
+        if (json[i].name.endsWith(branch))
         {
             core.notice("Trigger build for: " + json[i].name);
 
