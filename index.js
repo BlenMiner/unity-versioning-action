@@ -50,7 +50,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
             'Authorization': `Basic ${cloudToken}`
         },
         body: JSON.stringify({
-            name: name,
+            name: name + "-" + branch,
             platform: name,
             enabled: true,
             settings:
