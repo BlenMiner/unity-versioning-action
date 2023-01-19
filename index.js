@@ -75,7 +75,10 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
     });
 
     let json = await response.json();
-    const buildtargetid = json.buildtargetid;
+    let buildtargetid = json.buildtargetid;
+
+    if (buildtargetid == null || buildtargetid == undefined)
+    buildtargetid = name;
 
     await SetEnvVariables(cloudToken, projectId, buildtargetid, {
         KEY: core.getInput('S3_KEY', {required: true}),
@@ -89,7 +92,10 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
 {
     try
     {
-        const projectId = await CreateProject(cloudToken, repoName, repoSSHUrl);
+        let projectId = await CreateProject(cloudToken, repoName, repoSSHUrl);
+
+        if (projectId == null || projectId == undefined)
+            projectId = repoName;
 
         await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64");
         await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal");
@@ -97,7 +103,7 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
 
         await CreateBuildTarget(cloudToken, projectId, "staging", "standalonewindows64");
         await CreateBuildTarget(cloudToken, projectId, "staging", "standaloneosxuniversal");
-        await CreateBuildTarget(cloudToken, rojectId, "staging", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "staging", "standalonelinux64");
 
         await CreateBuildTarget(cloudToken, projectId, "prod", "standalonewindows64");
         await CreateBuildTarget(cloudToken, projectId, "prod", "standaloneosxuniversal");
