@@ -11,7 +11,7 @@ async function run()
         {
             const cloudToken = core.getInput('token', {required: true});
 
-            let url = `${endpoit}/orgs/{orgid}/projects/${github.context.repo.repo}/buildtargets/_all/builds`;
+            let url = `${endpoit}/orgs/20066711958695/projects/${github.context.repo.repo}/buildtargets/_all/builds`;
             
             const response = await fetch(url, {
                 method: "GET",
@@ -23,7 +23,7 @@ async function run()
 
             let json = await response.json();
 
-            console.log(json);
+            core.info(json);
         }
         catch (error)
         {
