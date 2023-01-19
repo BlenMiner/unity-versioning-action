@@ -200,7 +200,7 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
 
 async function RebuildLauncher(cloudToken, branch) 
 {
-    let url = `${endpoit}/projects/${projectId}/buildtargets`;
+    let url = `${endpoit}/projects/ig-launcher/buildtargets`;
     let res = await fetch(url, {
         method: "GET",
         headers: {
