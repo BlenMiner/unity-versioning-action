@@ -101,6 +101,8 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
         if (projectId == null || projectId == undefined)
             projectId = repoName;
 
+        core.info(projectId);
+
         await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64");
         await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal");
         await CreateBuildTarget(cloudToken, projectId, "dev", "standalonelinux64");
