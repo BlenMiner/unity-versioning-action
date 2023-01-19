@@ -2,7 +2,28 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const fetch = require('cross-fetch');
 
-const endpoit = "https://build-api.cloud.unity3d.com/api/v1/orgs/20066711958695";
+const endpoit = "https://build-api.cloud.unity3d.com/api/v1/orgs/will_ig";
+
+async function GetProjectIdByName(projectName)
+{
+    let url = `${endpoit}/projects`;
+    let res = await fetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${cloudToken}`
+        },
+        body: JSON.stringify(vars)
+    });
+
+    let json = await res.json();
+    
+    for(let i = 0; json.Length; ++i)
+    {
+        if (json[i].name == projectName) return json[i].projectId;
+    }
+    return undefined;
+}
 
 async function SetEnvVariables(cloudToken, projectId, buildtargetid, vars)
 {
@@ -173,8 +194,14 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
     let json = await response.json();
     core.info("CreateProject\n" + JSON.stringify(json));
 
-    const projectId = json.projectid;
-    return projectId;
+    if (json.projectid === undefined)
+    {
+        return GetProjectIdByName(repoName);
+    }
+    else
+    {
+        return json.projectid;
+    }
 }
 
 async function RebuildLauncher(cloudToken) 
