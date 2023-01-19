@@ -7,7 +7,7 @@ const endpoit = "https://build-api.cloud.unity3d.com/api/v1/orgs/20066711958695"
 async function SetEnvVariables(cloudToken, projectId, buildtargetid, vars)
 {
     let url = `${endpoit}/projects/${projectId}/buildtargets/${buildtargetid}/envvars`;
-    await fetch(url, {
+    let res = await fetch(url, {
         method: "PUT",
         headers: {
             'Content-Type': 'application/json',
@@ -15,6 +15,9 @@ async function SetEnvVariables(cloudToken, projectId, buildtargetid, vars)
         },
         body: JSON.stringify(vars)
     });
+
+    let json = await res.json();
+    core.info("SetEnvVariables\n" + JSON.stringify(json));
 }
 
 async function CreateBuildTarget(cloudToken, projectId, branch, name)
@@ -75,6 +78,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
     });
 
     let json = await response.json();
+    core.info("CreateBuildTarget\n" + JSON.stringify(json));
     let buildtargetid = json.buildtargetid;
 
     if (buildtargetid == null || buildtargetid == undefined)
@@ -165,6 +169,8 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
     });
 
     let json = await response.json();
+    core.info("CreateProject\n" + JSON.stringify(json));
+
     const projectId = json.projectid;
     return projectId;
 }
