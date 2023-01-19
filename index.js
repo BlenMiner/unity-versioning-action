@@ -14,18 +14,21 @@ async function run()
             let url = `${endpoit}/orgs/20066711958695/projects/ig-launcher/buildtargets/_all/builds`;
             
             const response = await fetch(url, {
-                method: "GET",
+                method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Basic ${cloudToken}`
                 },
+                body: JSON.stringify({
+                    clean: false,
+                    delay: 0
+                })
             });
 
             let json = await response.json();
 
-            core.info(url);
             core.info(JSON.stringify(json));
-            core.info(github);
+            core.info(JSON.stringify(github));
         }
         catch (error)
         {
