@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const { GitHub } = require('@actions/github/lib/utils');
 const fetch = require('cross-fetch');
 
 const endpoit = "https://build-api.cloud.unity3d.com/api/v1/orgs/will_ig";
@@ -58,6 +59,8 @@ async function DeleteAllBuildTargets(cloudToken, projectId)
                 'Authorization': `Basic ${cloudToken}`
             }
         });
+
+        core.notice("Deleting " + json[i].name);
     }
 }
 
@@ -141,7 +144,7 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
         if (projectId == null || projectId == undefined)
             projectId = repoName;
 
-        await DeleteAllBuildTargets();
+        await DeleteAllBuildTargets(cloudToken, projectId);
 
         await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64");
         await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal");
