@@ -81,8 +81,9 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
             enabled: true,
             settings:
             {
-                autoBuild: true,
-                autoDetectUnityVersion: true,
+                autoBuild: false,
+                unityVersion: "2021_3_14",
+                autoDetectUnityVersion: false,
                 fallbackPatchVersion: true,
                 executablename: "Internet-Game",
                 scm: {
@@ -231,6 +232,41 @@ async function RebuildLauncher(cloudToken, branch)
     }
 }
 
+async function Rebuild(cloudToken, projectId, branch) 
+{
+    const pid = await GetProjectIdByName(cloudToken, projectId);
+
+    let url = `${endpoit}/projects/${pid}/buildtargets`;
+    let res = await fetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${cloudToken}`
+        }
+    });
+
+    let json = await res.json();
+    for(let i = 0; i < json.length; ++i)
+    {
+        if (json[i].name.endsWith(branch))
+        {
+            core.notice("Trigger build for: " + json[i].name);
+
+            await fetch(`${endpoit}/projects/${pid}/buildtargets/${json[i].buildtargetid}/builds`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${cloudToken}`
+                },
+                body: JSON.stringify({
+                    clean: false,
+                    delay: 0
+                })
+            });
+        }
+    }
+}
+
 async function run()
 {
     {
@@ -246,6 +282,11 @@ async function run()
                     github.context.payload.repository.name,
                     github.context.payload.repository.ssh_url
                 );
+            }
+            else if (mode == "Trigger")
+            {
+                const branch = github.context.ref.substring("refs/heads/".length);
+                await Rebuild(cloudToken, github.context.payload.repository.name, branch);
             }
             else
             {
