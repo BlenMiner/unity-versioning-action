@@ -82,7 +82,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
             settings:
             {
                 autoBuild: false,
-                unityVersion: "2021_3_14",
+                unityVersion: "latest2021",
                 autoDetectUnityVersion: false,
                 fallbackPatchVersion: true,
                 executablename: "Internet-Game",
