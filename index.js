@@ -127,8 +127,10 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
     let json = await response.json();
     let buildtargetid = json.buildtargetid;
 
+    core.notice(JSON.stringify(json));
+
     if (buildtargetid == null || buildtargetid == undefined)
-    buildtargetid = name;
+        buildtargetid = name;
 
     await SetEnvVariables(cloudToken, projectId, buildtargetid, {
         KEY:    core.getInput('S3_KEY', {required: true}),
@@ -201,35 +203,7 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
 
 async function RebuildLauncher(cloudToken, branch) 
 {
-    let url = `${endpoit}/projects/ig-launcher/buildtargets`;
-    let res = await fetch(url, {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${cloudToken}`
-        }
-    });
-
-    let json = await res.json();
-    for(let i = 0; i < json.length; ++i)
-    {
-        if (json[i].name.endsWith(branch))
-        {
-            core.notice("Trigger build for: " + json[i].name);
-
-            await fetch(`${endpoit}/projects/ig-launcher/buildtargets/_all/builds`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Basic ${cloudToken}`
-                },
-                body: JSON.stringify({
-                    clean: false,
-                    delay: 0
-                })
-            });
-        }
-    }
+    await Rebuild(cloudToken, "ig-launcher", branch);
 }
 
 async function Rebuild(cloudToken, projectId, branch) 
