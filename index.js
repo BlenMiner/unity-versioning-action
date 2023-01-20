@@ -82,8 +82,8 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
             settings:
             {
                 autoBuild: false,
-                unityVersion: "latest2021",
-                autoDetectUnityVersion: false,
+                unityVersion: "latest2021_3",
+                autoDetectUnityVersion: true,
                 fallbackPatchVersion: true,
                 executablename: "Internet-Game",
                 "ccdEnabled": false,
@@ -103,7 +103,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                     "repeatCycle": "once",
                     "cleanBuild": false
                 },
-                autoBuildCancellation : true,
+                autoBuildCancellation : branch.toUpperCase() != "PROD",
                 operatingSystemSelected: "mac",
                 "rubyVersion": "ruby_version_2_7_4",
                 advanced: {
@@ -134,7 +134,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                             buildAddressables: true,
                             "uploadAddressables": false,
                             contentUpdate: false,
-                            profileName: "Default",
+                            profileName: "",
                             failedAddressablesFailsBuild: true,
                             "contentUpdateSettings": {
                                 "contentStatePath": "",
