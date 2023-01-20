@@ -20,7 +20,7 @@ async function GetProjectIdByName(cloudToken, projectName)
 
     for(let i = 0; i < json.length; ++i)
     {
-        if (json[i].name == projectName) return json[i].projectid;
+        if (json[i].name == projectName) return json[i].guid;
     }
     return undefined;
 }
@@ -87,7 +87,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                 fallbackPatchVersion: true,
                 executablename: "Internet-Game",
                 scm: {
-                    type: "git",
+                    type: "oauth",
                     branch: branch
                 },
                 platform: {
@@ -180,8 +180,26 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
             settings: {
                 remoteCacheStrategy: "library",
                 scm: {
-                    type: "git",
-                    url: repoSSHUrl
+                    type: "oauth",
+                    url: repoSSHUrl,
+                    useEncryption: false,
+                    oauth: {
+                        scm_provider: "github",
+                        github: {
+                            repository: {
+                                owner: {
+                                    "avatar_url": "https://avatars.githubusercontent.com/u/103954087?v=4",
+                                    "login": "Internet-Game"
+                                },
+                                clone_url: `https://github.com/Internet-Game/${repoName}.git`,
+                                forks: 0,
+                                full_name: "Internet-Game/" + repoName,
+                                name: repoName,
+                                scm: "git",
+                                provider_id: "588266512"
+                            }
+                        }
+                    }
                 }
             }
         })
@@ -189,13 +207,13 @@ async function CreateProject(cloudToken, repoName, repoSSHUrl) {
 
     let json = await response.json();
 
-    if (json.projectid === undefined)
+    if (json.guid === undefined)
     {
         return GetProjectIdByName(cloudToken, repoName);
     }
     else
     {
-        return json.projectid;
+        return json.guid;
     }
 }
 
