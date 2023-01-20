@@ -86,35 +86,60 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                 autoDetectUnityVersion: false,
                 fallbackPatchVersion: true,
                 executablename: "Internet-Game",
+                "ccdEnabled": false,
+                "ccdBucketId": "",
+                "ccdApiKey": "c5643e4b0ca994341f626f2b24e8bd8c",
+                "ccdStripRemotePath": false,
+                "ccdPreserveBucket": false,
+                "ccdCreateRelease": false,
                 scm: {
                     type: "oauth",
                     branch: branch
                 },
-                platform: {
-                    bundleId: "com.internetgame.launcher",
-                    xcodeVersion: "latest"
-                },
+                platform: {},
                 buildSchedule: {
-                    isEnabled: false
+                    isEnabled: false,
+                    "date": "2023-01-20T11:11:07.928Z",
+                    "repeatCycle": "once",
+                    "cleanBuild": false
                 },
                 autoBuildCancellation : true,
                 operatingSystemSelected: "mac",
+                "rubyVersion": "ruby_version_2_7_4",
                 advanced: {
                     unity: {
                         preExportMethod: "AddressableHelper.PreBuildAddressables",
                         postExportMethod: "AddressableHelper.PostBuildAddressables",
+                        "preBuildScript": "",
+                        "postBuildScript": "",
+                        "preBuildScriptFailsBuild": false,
+                        "postBuildScriptFailsBuild": false,
                         scriptingDefineSymbols: branch.toUpperCase(),
                         playerExporter: {
+                            "sceneList": [],
                             export: false,
                             buildOptions: [
                                 "CompressWithLz4HC"
                             ],
                         },
+                        "assetBundles": {
+                            "buildBundles": false,
+                            "basePath": "",
+                            "buildAssetBundleOptions": "",
+                            "copyToStreamingAssets": false,
+                            "copyBundlePatterns": [],
+                            "uploadAssetBundles": false
+                        },
                         addressables: {
                             buildAddressables: true,
+                            "uploadAddressables": false,
                             contentUpdate: false,
                             profileName: "Default",
-                            failedAddressablesFailsBuild: true
+                            failedAddressablesFailsBuild: true,
+                            "contentUpdateSettings": {
+                                "contentStatePath": "",
+                                "linkedTargetId": ""
+                            }
                         },
                         runUnitTests: false,
                         runEditModeTests: false,
