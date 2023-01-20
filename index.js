@@ -105,7 +105,10 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                         postExportMethod: "AddressableHelper.PostBuildAddressables",
                         scriptingDefineSymbols: branch,
                         playerExporter: {
-                            export: false
+                            export: false,
+                            buildOptions: [
+                                "BuildOptions.CompressWithLz4HC"
+                            ],
                         },
                         addressables: {
                             buildAddressables: true,
