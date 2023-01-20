@@ -88,7 +88,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                 executablename: "Internet-Game",
                 "ccdEnabled": false,
                 "ccdBucketId": "",
-                "ccdApiKey": "c5643e4b0ca994341f626f2b24e8bd8c",
+                "ccdApiKey": "",
                 "ccdStripRemotePath": false,
                 "ccdPreserveBucket": false,
                 "ccdCreateRelease": false,
