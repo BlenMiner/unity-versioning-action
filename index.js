@@ -103,7 +103,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                     unity: {
                         preExportMethod: "AddressableHelper.PreBuildAddressables",
                         postExportMethod: "AddressableHelper.PostBuildAddressables",
-                        scriptingDefineSymbols: branch,
+                        scriptingDefineSymbols: branch.toUpperCase(),
                         playerExporter: {
                             export: false,
                             buildOptions: [
