@@ -107,7 +107,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                         playerExporter: {
                             export: false,
                             buildOptions: [
-                                "BuildOptions.CompressWithLz4HC"
+                                "CompressWithLz4HC"
                             ],
                         },
                         addressables: {
