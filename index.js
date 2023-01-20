@@ -127,8 +127,6 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
     let json = await response.json();
     let buildtargetid = json.buildtargetid;
 
-    core.notice(JSON.stringify(json));
-
     if (buildtargetid == null || buildtargetid == undefined)
         buildtargetid = name;
 
