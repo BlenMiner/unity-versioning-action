@@ -119,9 +119,11 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher
                         playerExporter: {
                             "sceneList": [],
                             export: true,
-                            buildOptions: [
+                            buildOptions: isServer ? [
                                 "CompressWithLz4HC",
-                                "EnableHeadlessMode"
+                                "EnableHeadlessMode" 
+                            ]: [
+                                "CompressWithLz4HC"
                             ],
                         },
                         "assetBundles": {
