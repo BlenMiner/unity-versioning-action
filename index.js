@@ -300,7 +300,8 @@ async function Rebuild(cloudToken, projectId, branch)
                 },
                 body: JSON.stringify({
                     clean: false,
-                    delay: 0
+                    delay: 0,
+                    commit: github.context.payload.sha
                 })
             });
         }
