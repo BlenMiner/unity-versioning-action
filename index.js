@@ -302,7 +302,7 @@ async function run()
         {
             const cloudToken = core.getInput('token', {required: true});
             const mode = core.getInput('mode', {required: false});
-            const isLauncher = core.getInput('launcher', {required: true}) == "true";
+            const isLauncher = core.getInput('launcher', {required: false}) == "true";
             
             if (mode == "Init")
             {
