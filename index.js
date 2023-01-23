@@ -66,7 +66,7 @@ async function DeleteAllBuildTargets(cloudToken, projectId)
 
 function makeid(length) {
     var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -86,7 +86,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher
             'Authorization': `Basic ${cloudToken}`
         },
         body: JSON.stringify({
-            name: makeid(5) + "-" + name + (isServer ? "-server" : "") + "-" + branch,
+            name: name + (isServer ? "-server" : "") + "-" + makeid(5) + "-" + branch,
             platform: name,
             enabled: true,
             settings:
