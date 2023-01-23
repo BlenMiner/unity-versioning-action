@@ -64,7 +64,7 @@ async function DeleteAllBuildTargets(cloudToken, projectId)
     }
 }
 
-async function CreateBuildTarget(cloudToken, projectId, branch, name)
+async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher, isServer)
 {
     core.notice("Creating " + name + "-" + branch);
 
@@ -76,7 +76,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
             'Authorization': `Basic ${cloudToken}`
         },
         body: JSON.stringify({
-            name: name + "-" + branch,
+            name: name + (isServer ? "-server" : "") + "-" + branch,
             platform: name,
             enabled: true,
             settings:
@@ -108,18 +108,20 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                 "rubyVersion": "ruby_version_2_7_4",
                 advanced: {
                     unity: {
-                        preExportMethod: "AddressableHelper.PreBuildAddressables",
-                        postExportMethod: "AddressableHelper.PostBuildAddressables",
+                        preExportMethod: isLauncher ? "AddressableHelper.PreBuildScript" : "AddressableHelper.PreBuildAddressables",
+                        postExportMethod: isLauncher ? "AddressableHelper.PostBuildScript" : "AddressableHelper.PostBuildAddressables",
                         "preBuildScript": "",
                         "postBuildScript": "",
                         "preBuildScriptFailsBuild": false,
                         "postBuildScriptFailsBuild": false,
-                        scriptingDefineSymbols: branch.toUpperCase(),
+                        scriptingDefineSymbols: isServer ? `${branch.toUpperCase()}; SERVER; UNITY_SERVER` : 
+                                                            branch.toUpperCase(),
                         playerExporter: {
                             "sceneList": [],
-                            export: false,
+                            export: true,
                             buildOptions: [
-                                "CompressWithLz4HC"
+                                "CompressWithLz4HC",
+                                "EnableHeadlessMode"
                             ],
                         },
                         "assetBundles": {
@@ -131,7 +133,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
                             "uploadAssetBundles": false
                         },
                         addressables: {
-                            buildAddressables: true,
+                            buildAddressables: !isLauncher,
                             "uploadAddressables": false,
                             contentUpdate: false,
                             profileName: "",
@@ -163,10 +165,11 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name)
         SECRET: core.getInput('S3_SECRET', {required: true}),
         BUCKET: core.getInput('S3_BUCKET', {required: true}),
         REGION: core.getInput('S3_REGION', {required: true}),
+        PLAYFLOW: core.getInput('PLAYFLOW_' + branch.toUpperCase(), {required: true}),
     });
 }
 
-async function InitProject(cloudToken, repoName, repoSSHUrl)
+async function InitProject(cloudToken, repoName, repoSSHUrl, isLauncher)
 {
     try
     {
@@ -177,17 +180,24 @@ async function InitProject(cloudToken, repoName, repoSSHUrl)
 
         await DeleteAllBuildTargets(cloudToken, projectId);
 
-        await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64");
-        await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal");
-        await CreateBuildTarget(cloudToken, projectId, "dev", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "dev", "standalonewindows64", isLauncher, false);
+        await CreateBuildTarget(cloudToken, projectId, "dev", "standaloneosxuniversal", isLauncher, false);
+        await CreateBuildTarget(cloudToken, projectId, "dev", "standalonelinux64", isLauncher, false);
 
-        await CreateBuildTarget(cloudToken, projectId, "staging", "standalonewindows64");
-        await CreateBuildTarget(cloudToken, projectId, "staging", "standaloneosxuniversal");
-        await CreateBuildTarget(cloudToken, projectId, "staging", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "staging", "standalonewindows64", isLauncher, false);
+        await CreateBuildTarget(cloudToken, projectId, "staging", "standaloneosxuniversal", isLauncher, false);
+        await CreateBuildTarget(cloudToken, projectId, "staging", "standalonelinux64", isLauncher, false);
 
-        await CreateBuildTarget(cloudToken, projectId, "prod", "standalonewindows64");
-        await CreateBuildTarget(cloudToken, projectId, "prod", "standaloneosxuniversal");
-        await CreateBuildTarget(cloudToken, projectId, "prod", "standalonelinux64");
+        await CreateBuildTarget(cloudToken, projectId, "prod", "standalonewindows64", isLauncher, false);
+        await CreateBuildTarget(cloudToken, projectId, "prod", "standaloneosxuniversal", isLauncher, false);
+        await CreateBuildTarget(cloudToken, projectId, "prod", "standalonelinux64", isLauncher, false);
+
+        if (isLauncher)
+        {
+            await CreateBuildTarget(cloudToken, projectId, "dev", "standalonelinux64", true, true);
+            await CreateBuildTarget(cloudToken, projectId, "staging", "standalonelinux64", true, true);
+            await CreateBuildTarget(cloudToken, projectId, "prod", "standalonelinux64", true, true);
+        }
     }
     catch (error) { core.setFailed(error.message); }
 }
@@ -292,13 +302,15 @@ async function run()
         {
             const cloudToken = core.getInput('token', {required: true});
             const mode = core.getInput('mode', {required: false});
+            const isLauncher = core.getInput('launcher', {required: true}) == "true";
             
             if (mode == "Init")
             {
                 await InitProject(
                     cloudToken,
                     github.context.payload.repository.name,
-                    github.context.payload.repository.ssh_url
+                    github.context.payload.repository.ssh_url,
+                    isLauncher
                 );
             }
             else if (mode == "Trigger")
