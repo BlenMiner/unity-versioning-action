@@ -85,7 +85,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher
                 unityVersion: "latest2021_3",
                 autoDetectUnityVersion: true,
                 fallbackPatchVersion: true,
-                executablename: "Internet-Game",
+                executablename: isServer ? "Server" : "Internet-Game",
                 "ccdEnabled": false,
                 "ccdBucketId": "",
                 "ccdApiKey": "",
