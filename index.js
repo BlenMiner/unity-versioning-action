@@ -327,14 +327,16 @@ async function run()
             }
             else if (mode == "Trigger")
             {
-                /*const branch = github.context.ref.substring("refs/heads/".length);
-                await Rebuild(cloudToken, github.context.payload.repository.name, branch);*/
-                core.info("Currently launcher triggering is disabled");
+                const branch = github.context.ref.substring("refs/heads/".length);
+                await Rebuild(cloudToken, github.context.payload.repository.name, branch);
             }
             else
             {
-                const branch = github.context.ref.substring("refs/heads/".length);
-                await RebuildLauncher(cloudToken, branch);
+                /*const branch = github.context.ref.substring("refs/heads/".length);
+                await RebuildLauncher(cloudToken, branch);*/
+
+                core.info("Currently launcher triggering is disabled");
+
             }
         }
         catch (error)
