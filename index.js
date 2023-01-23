@@ -64,6 +64,16 @@ async function DeleteAllBuildTargets(cloudToken, projectId)
     }
 }
 
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
 async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher, isServer)
 {
     core.notice("Creating " + name + "-" + branch);
@@ -76,7 +86,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher
             'Authorization': `Basic ${cloudToken}`
         },
         body: JSON.stringify({
-            name: name + (isServer ? "-server" : "") + "-" + branch,
+            name: makeid(5) + "-" + name + (isServer ? "-server" : "") + "-" + branch,
             platform: name,
             enabled: true,
             settings:
