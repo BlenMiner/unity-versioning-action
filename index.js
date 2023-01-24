@@ -113,7 +113,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher
                     "repeatCycle": "once",
                     "cleanBuild": false
                 },
-                autoBuildCancellation : branch.toUpperCase() != "PROD",
+                autoBuildCancellation : false,
                 operatingSystemSelected: "mac",
                 "rubyVersion": "ruby_version_2_7_4",
                 advanced: {
