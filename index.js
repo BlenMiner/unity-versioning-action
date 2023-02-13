@@ -120,7 +120,7 @@ async function CreateBuildTarget(cloudToken, projectId, branch, name, isLauncher
                     unity: {
                         preExportMethod: isLauncher ? "AddressableHelper.PreBuildScript" : "AddressableHelper.PreBuildAddressables",
                         postExportMethod: isLauncher ? "AddressableHelper.PostBuildScript" : "AddressableHelper.PostBuildAddressables",
-                        "preBuildScript": "",
+                        "preBuildScript": (isLauncher && branch != "prod") ? "update-game.sh" : "",
                         "postBuildScript": "",
                         "preBuildScriptFailsBuild": false,
                         "postBuildScriptFailsBuild": false,
